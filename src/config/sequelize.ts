@@ -53,7 +53,7 @@ export const sequelize_db :Sequelize = new Sequelize(database, username, passwor
     dialect: 'postgres'
 });
 const initModels = () => {
-    OrderModel.initModel(sequelize_db); // Передаем экземпляр sequelize в метод инициализации модели
+    OrderModel.initModel(sequelize_db);
 };
 
 export const postgresConnection = async () => {

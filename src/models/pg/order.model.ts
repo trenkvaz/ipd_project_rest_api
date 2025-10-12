@@ -58,7 +58,7 @@ export class OrderModel extends Model<IOrder>  {
     declare amount: number;
     declare status: 'pending' | 'paid' | 'canceled';
     declare createdAt: Date;
-    /*public id?: number;
+   /* public id?: number;
     public userId?: number;
     public amount?: number;
     public status?: 'pending' | 'paid' | 'canceled';
