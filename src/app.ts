@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import {mongoConnection} from "./config/mongoose";
 import {postgresConnection} from "./config/sequelize";
 import {IOrder} from './types/order';
@@ -5,26 +7,67 @@ import {IUser} from './types/user';
 import {creatOrder} from './repositories/pg/order.repository';
 import UserRepository from './repositories/mongo/user.repository';
 import OrderRepository from './repositories/pg/order.repository';
+
+import express from 'express'
+//import 'reflect-metadata'
+import compression from 'compression'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
+import helmet from 'helmet'
+import hpp from 'hpp'
 //import {CreationAttributes} from "sequelize";
+import {OrderRoutes} from "./routes/order.routes";
+import {ErrorMiddleware} from "./middlewares/error.middleware";
 
 class App {
     private userRepository: UserRepository;
     private orderRepository: OrderRepository;
+    private expressApp: express.Application;
+    //private env: string
+    private port: string | number
 
     constructor() {
+        this.expressApp = express();
+        this.port = process.env.PORT!.toString();
+        console.log("port",this.port)
+        console.log(typeof this.port)
+        this.initExpressAppMiddlewares();
+        this.initRoutes();
+        this.expressApp.use(ErrorMiddleware)
         this.connectToDatabases();
         this.userRepository = new UserRepository();
         this.orderRepository = new OrderRepository();
     }
+
+    initExpressAppMiddlewares(){
+        this.expressApp.use(cors({ origin: process.env.ORIGIN! }))
+        this.expressApp.use(hpp())
+        this.expressApp.use(helmet())
+        this.expressApp.use(compression())
+        this.expressApp.use(express.json())
+        this.expressApp.use(express.urlencoded({ extended: true }))
+        this.expressApp.use(cookieParser())
+
+    }
+
+    private initRoutes() {
+        this.expressApp.use('/', new OrderRoutes().getRouter())
+    }
+
+    public listen() {
+        this.expressApp.listen(this.port, () => {
+            console.log("listen")
+        })
+    }
+
     private async connectToDatabases() {
         try {
             await mongoConnection();
             await postgresConnection();
-            this.testDB();
+           // this.testDB();
         } catch (e) {
             throw e
         }
-
     }
 
     private async testDB(){

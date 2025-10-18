@@ -43,6 +43,7 @@
     "forceConsistentCasingInFileNames": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true
  //  "strictFunctionTypes": false
   }
 }

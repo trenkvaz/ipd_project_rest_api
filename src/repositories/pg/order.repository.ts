@@ -3,6 +3,7 @@ import {OrderModel} from '../../models/pg/order.model';
 import {IUser} from "../../types/user";
 import UserModel from "../../models/mongo/user.model";
 import {Types} from "mongoose";
+import {AppError} from "../../middlewares/error.middleware";
 //import {CreationAttributes} from "sequelize";
 
 
@@ -21,7 +22,13 @@ export async function creatOrder(order:IOrder){
 export default class OrderRepository {
 
     public async creatOrder(order:IOrder){
-        return (await OrderModel.create(order));
+        try {
+            return await OrderModel.create(order);
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,502,'repository');
+        }
+
     }
 
     public async updateOrder(order:IOrder){

@@ -6,3 +6,9 @@ export interface IOrder {
     status: 'pending' | 'paid' | 'canceled';
     createdAt?: Date;
 }
+
+/*
+export interface IOrderService {
+    createOrder(order: IOrder);
+    // другие методы...
+}*/
