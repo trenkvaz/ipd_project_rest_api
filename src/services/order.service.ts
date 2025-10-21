@@ -1,6 +1,7 @@
 import {IOrder} from '../types/order';
 import OrderRepository from "../repositories/pg/order.repository";
 import {AppError} from "../middlewares/error.middleware";
+import {NextFunction} from "express";
 
 export class OrderService {
     private orderRepository: OrderRepository;
@@ -13,8 +14,10 @@ export class OrderService {
         try {
             const resOrder = await this.orderRepository.creatOrder(order);
             //resOrder.dataValues.id = undefined;
-            if (resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
-                throw new AppError('Order creation failed: id or createdAt is undefined',404,'service');
+            //if(resOrder === undefined)throw new AppError('Order creation failed: id or createdAt is undefined',404);
+            if (resOrder === undefined || resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
+                //next(new AppError('Order creation failed: id or createdAt is undefined',404));
+                throw new AppError('Order creation failed: id or createdAt is undefined',404);
             }
             const order1: IOrder = {
                 id: resOrder.dataValues.id,
@@ -23,11 +26,14 @@ export class OrderService {
                 status: resOrder.dataValues.status,
                 createdAt: resOrder.dataValues.createdAt
             };
+            //return resOrder;
             return order1;
-        } catch (error:unknown) {
+        } catch (error:any) {
             //console.log("ERROR")
             if(error instanceof AppError)throw error
-            else throw new AppError('Ошибка создания заказа: ',404,'service');
+            else throw new AppError('OrderService Ошибка создания заказа: '+error.message,400);
+
+            //next(new AppError('Ошибка создания заказа: ',404));
         }
 
     }

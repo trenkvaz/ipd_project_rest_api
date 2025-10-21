@@ -4,7 +4,7 @@ import {mongoConnection} from "./config/mongoose";
 import {postgresConnection} from "./config/sequelize";
 import {IOrder} from './types/order';
 import {IUser} from './types/user';
-import {creatOrder} from './repositories/pg/order.repository';
+//import {creatOrder} from './repositories/pg/order.repository';
 import UserRepository from './repositories/mongo/user.repository';
 import OrderRepository from './repositories/pg/order.repository';
 
@@ -84,9 +84,9 @@ class App {
             status: 'pending',
         };*/
 
-        let resOrder =(await this.orderRepository.creatOrder(order))
+       /* let resOrder =(await this.orderRepository.creatOrder(order))
         let resOrder1 =(await this.orderRepository.creatOrder(order))
-        console.log(typeof resOrder)
+        console.log(typeof resOrder)*/
       /*  if (resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
             throw new Error('Order creation failed: id or createdAt is undefined');
         }

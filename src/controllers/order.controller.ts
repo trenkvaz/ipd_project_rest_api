@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {IOrder} from '../types/order';
 import {OrderService} from "../services/order.service";
+import {AppError} from "../middlewares/error.middleware";
 
 export class OrderController {
 
@@ -20,7 +21,7 @@ export class OrderController {
          }
      }
 
-     postOrder = async(req: Request, res: Response, next:NextFunction)=>{
+     postOrder = async(req: Request, res: Response)=>{
 
         const body:any = req.body
         //console.log(req)
@@ -35,13 +36,17 @@ export class OrderController {
         }
 
          try {
+
             // let result = await service();
              //console.log("exports.form-result",form-result)
              return res.status(200).json({ status: 200, data:(await this.orderService.createOrder(order)), message: "заказ создан" });
-         } catch (e) {
+         } catch (error:any) {
              //return res.status(500).json({ status: 500, message: e.message });
-             console.log("postOrder e")
-             next(e)
+             /*if(error instanceof AppError) console.log("postOrder AppError "+error.message)
+             else console.log("postOrder no AppError")
+             next(new AppError('Ошибка контроллера: ',400))*/
+             if(error instanceof AppError)throw error
+             else throw new AppError('OrderController Ошибка создания заказа: '+error.message,500);
          }
 
 
