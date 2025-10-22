@@ -15,7 +15,7 @@ export class OrderService {
             const resOrder = await this.orderRepository.creatOrder(order);
             //resOrder.dataValues.id = undefined;
             //if(resOrder === undefined)throw new AppError('Order creation failed: id or createdAt is undefined',404);
-            if (resOrder === undefined || resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
+            /*if (resOrder === undefined || resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
                 //next(new AppError('Order creation failed: id or createdAt is undefined',404));
                 throw new AppError('Order creation failed: id or createdAt is undefined',404);
             }
@@ -25,13 +25,13 @@ export class OrderService {
                 amount: resOrder.dataValues.amount,
                 status: resOrder.dataValues.status,
                 createdAt: resOrder.dataValues.createdAt
-            };
+            };*/
             //return resOrder;
-            return order1;
+            return resOrder;
         } catch (error:any) {
             //console.log("ERROR")
             if(error instanceof AppError)throw error
-            else throw new AppError('OrderService Ошибка создания заказа: '+error.message,400);
+            else throw new AppError('OrderService Ошибка создания заказа: '+error.message,500);
 
             //next(new AppError('Ошибка создания заказа: ',404));
         }

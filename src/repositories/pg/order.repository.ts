@@ -25,10 +25,12 @@ export default class OrderRepository {
     public async creatOrder(order:IOrder){
         try {
             //return undefined;
-            return await OrderModel.create(order);
+            let res = await OrderModel.create(order);
+            console.log("creatOrder",JSON.stringify(res));
+            return res;
         } catch (error:any) {
             //console.log("ERROR")
-            throw new AppError('Ошибка базы данных: ' + error.message,502);
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
             //next(new AppError('Ошибка базы данных: ' + error.message,502));
         }
 

@@ -43,7 +43,10 @@
     "forceConsistentCasingInFileNames": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
  //  "strictFunctionTypes": false
   }
 }
