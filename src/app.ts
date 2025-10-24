@@ -18,45 +18,53 @@ import hpp from 'hpp'
 //import {CreationAttributes} from "sequelize";
 import {OrderRoutes} from "./routes/order.routes";
 import {ErrorMiddleware} from "./middlewares/error.middleware";
-
+import passport ,{authRouter,authMiddleware} from "./middlewares/auth.middleware";
+import bodyParser from 'body-parser';
 class App {
     private userRepository: UserRepository;
     private orderRepository: OrderRepository;
     private expressApp: express.Application;
     //private env: string
-    private port: string | number
+    private port: string | number;
 
     constructor() {
         this.expressApp = express();
         this.port = process.env.PORT!.toString();
         console.log("port",this.port)
         console.log(typeof this.port)
+        this.initAuthorization();
         this.initExpressAppMiddlewares();
         this.initRoutes();
-        this.expressApp.use(ErrorMiddleware)
+        this.expressApp.use(ErrorMiddleware);
         this.connectToDatabases();
         this.userRepository = new UserRepository();
         this.orderRepository = new OrderRepository();
     }
 
     initExpressAppMiddlewares(){
-        this.expressApp.use(cors({ origin: process.env.ORIGIN! }))
-        this.expressApp.use(hpp())
-        this.expressApp.use(helmet())
-        this.expressApp.use(compression())
-        this.expressApp.use(express.json())
-        this.expressApp.use(express.urlencoded({ extended: true }))
-        this.expressApp.use(cookieParser())
+        this.expressApp.use(cors({ origin: process.env.ORIGIN! }));
+        this.expressApp.use(hpp());
+        this.expressApp.use(helmet());
+        this.expressApp.use(compression());
+        this.expressApp.use(express.json());
+        this.expressApp.use(express.urlencoded({ extended: true }));
+        this.expressApp.use(cookieParser());
+        this.expressApp.use(bodyParser.json());
+    }
 
+    initAuthorization(){
+        this.expressApp.use(passport.initialize());
+        this.expressApp.use('/', authRouter());
+        this.expressApp.use(authMiddleware);
     }
 
     private initRoutes() {
-        this.expressApp.use('/', new OrderRoutes().getRouter())
+        this.expressApp.use('/', new OrderRoutes().getRouter());
     }
 
     public listen() {
         this.expressApp.listen(this.port, () => {
-            console.log("listen")
+            console.log("listen");
         })
     }
 

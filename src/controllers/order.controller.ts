@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {IOrder} from '../types/order';
 import {OrderService} from "../services/order.service";
 import {AppError} from "../middlewares/error.middleware";
-import {IsDate, IsEnum, IsInt, IsOptional, IsPositive, IsString, validate, ValidationError} from 'class-validator';
+import {IsDate, IsEnum, IsInt, IsOptional, IsPositive, IsString, validate} from 'class-validator';
 import { plainToInstance} from 'class-transformer';
 
 export class OrderController {
@@ -24,7 +24,7 @@ export class OrderController {
      }
 
      postOrder = async(req: Request, res: Response)=>{
-
+         console.log("req.user",req.user)
          //const body:any = req.body;
          const orderDto = <OrderDto>plainToInstance(OrderDto, req.body);
          console.log("orderDto",JSON.stringify(orderDto))

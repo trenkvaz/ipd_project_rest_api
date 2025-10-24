@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import {OrderController} from "../controllers/order.controller";
 import {ErrorMiddleware} from "../middlewares/error.middleware";
-
+import passport ,{authRouter,authMiddleware} from "../middlewares/auth.middleware";
 export class OrderRoutes {
 
     private orderController:OrderController;
@@ -28,9 +28,9 @@ export class OrderRoutes {
         const path = "/orders"
         const router = Router();
 
-        router.get(`${path}/`,ErrorMiddleware,this.testService);
+        router.get(`${path}/`,this.testService);
         router.get(`${path}/:id`, this.testService);
-        router.post(`${path}`, ErrorMiddleware,this.orderController.postOrder);
+        router.post(`${path}`,this.orderController.postOrder);
         router.put(`${path}/:id`, this.testService);
         router.delete(`${path}/:id`, this.testService);
 
