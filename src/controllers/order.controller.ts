@@ -24,7 +24,8 @@ export class OrderController {
      }
 
      postOrder = async(req: Request, res: Response)=>{
-         console.log("req.user",req.user)
+
+
          //const body:any = req.body;
          const orderDto = <OrderDto>plainToInstance(OrderDto, req.body);
          console.log("orderDto",JSON.stringify(orderDto))
@@ -58,7 +59,7 @@ export class OrderController {
              return res.status(400).json({ errors });
          }
          try {
-
+             //console.log("postOrder req",req);
             // let result = await service();
              //console.log("exports.form-result",form-result)
              return res.status(200).json({ status: 200, data:(await this.orderService.createOrder(orderDto)), message: "заказ создан" });

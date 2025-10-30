@@ -20,13 +20,13 @@ export class AppError extends Error{
 }
 
 export const ErrorMiddleware = (error: AppError, req: Request, res: Response, next: NextFunction) => {
-    console.log("ErrorMiddleware "+JSON.stringify(error))
-    try {
+    //console.log("ErrorMiddleware "+JSON.stringify(error))
+    //try {
         const status: number = error.status || 500;
         const message: string = error.message || 'Что-то пошло не так';
         res.status(status).json({ status:status,message:message });
-    } catch (error) {
+    /*} catch (error) {
         console.log("ErrorMiddleware e")
         next(error);
-    }
+    }*/
 };

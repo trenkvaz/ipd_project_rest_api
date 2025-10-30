@@ -8,7 +8,7 @@ import {IUser} from './types/user';
 import UserRepository from './repositories/mongo/user.repository';
 import OrderRepository from './repositories/pg/order.repository';
 
-import express from 'express'
+import express, {NextFunction, Request, Response} from 'express'
 //import 'reflect-metadata'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
@@ -17,9 +17,12 @@ import helmet from 'helmet'
 import hpp from 'hpp'
 //import {CreationAttributes} from "sequelize";
 import {OrderRoutes} from "./routes/order.routes";
-import {ErrorMiddleware} from "./middlewares/error.middleware";
+import {AppError, ErrorMiddleware} from "./middlewares/error.middleware";
 import passport ,{authRouter,authMiddleware} from "./middlewares/auth.middleware";
 import bodyParser from 'body-parser';
+import http from 'http';
+import requestLogger from './utils/logger';
+//import createError from 'http-errors';
 class App {
     private userRepository: UserRepository;
     private orderRepository: OrderRepository;
@@ -30,10 +33,10 @@ class App {
     constructor() {
         this.expressApp = express();
         this.port = process.env.PORT!.toString();
-        console.log("port",this.port)
-        console.log(typeof this.port)
-        this.initAuthorization();
+        console.log("port",this.port);
+        console.log(typeof this.port);
         this.initExpressAppMiddlewares();
+        this.initAuthorization();
         this.initRoutes();
         this.expressApp.use(ErrorMiddleware);
         this.connectToDatabases();
@@ -49,7 +52,8 @@ class App {
         this.expressApp.use(express.json());
         this.expressApp.use(express.urlencoded({ extended: true }));
         this.expressApp.use(cookieParser());
-        this.expressApp.use(bodyParser.json());
+        this.expressApp.use(requestLogger);
+        //this.expressApp.use(bodyParser.json());
     }
 
     initAuthorization(){
@@ -63,9 +67,21 @@ class App {
     }
 
     public listen() {
-        this.expressApp.listen(this.port, () => {
+        //server.on('error', onError);
+        /*this.expressApp.listen(this.port, () => {
             console.log("listen");
-        })
+        })*/
+        this.expressApp.use(function(req: Request, res: Response, next:NextFunction) {
+            next(new AppError("he he not found",404));
+            //next(createError())
+        });
+        const server = http.createServer(this.expressApp);
+        server.on('error', (error) => {
+            console.error('Error occurred:', error);
+        });
+        server.listen(this.port, () => {
+            console.log(`Server is running on http://localhost:${this.port}`);
+        });
     }
 
     private async connectToDatabases() {
