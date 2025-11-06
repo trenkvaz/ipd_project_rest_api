@@ -27,7 +27,7 @@ const requestLogger = expressWinston.logger({
     //meta: true, // Включает дополнительную информацию о запросе
     msg: '{{req.method}} {{req.url}} {{res.statusCode}} - {{res.responseTime}}ms - IP: {{req.ip}}',
     expressFormat: false,
-    colorize: false, // Если вы хотите, чтобы логи были цветными в консоли
+    colorize: false,
 });
 
 export default requestLogger;

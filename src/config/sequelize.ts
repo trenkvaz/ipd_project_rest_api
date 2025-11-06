@@ -1,15 +1,16 @@
 import * as dotenv from 'dotenv';
-import {DataTypes, QueryTypes, Sequelize} from 'sequelize';
+import {Sequelize} from 'sequelize';
 import {OrderModel} from '../models/pg/order.model';
 dotenv.config();
 
-const database:string = process.env.POSTGRES_DATABASE!.toString()
-const username:string = process.env.POSTGRES_USER!.toString()
-const password:string = process.env.POSTGRES_PASSWORD!.toString()
-const host:string = process.env.POSTGRES_HOST!.toString()
-console.log(typeof password); // Убедитесь, что это строка
-console.log(password);
-
+const database:string = process.env.POSTGRES_DATABASE!.toString();
+const username:string = process.env.POSTGRES_USER!.toString();
+const password:string = process.env.POSTGRES_PASSWORD!.toString();
+const host:string = process.env.POSTGRES_HOST!.toString();
+const port:number = Number(process.env.POSTGRES_PORT!);
+//console.log(typeof password);
+console.log("POSTGRES:");
+console.log("database",database,"username",username,"password",password,"host",host,"port",port)
 
 
 async function createDatabaseIfNotExists(){
@@ -49,7 +50,7 @@ async function createDatabaseIfNotExists(){
 
 export const sequelize_db :Sequelize = new Sequelize(database, username, password, {
     host: host,
-    port: Number(process.env.POSTGRES_PORT!),
+    port: port,
     dialect: 'postgres'
 });
 const initModels = () => {
