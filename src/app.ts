@@ -78,6 +78,7 @@ class App {
         const server = http.createServer(this.expressApp);
         server.on('error', (error) => {
             console.error('Error occurred:', error);
+            process.exit(1);
         });
         server.listen(this.port, () => {
             console.log(`Server is running on http://localhost:${this.port}`);
@@ -92,6 +93,10 @@ class App {
         } catch (e) {
             throw e
         }
+    }
+
+    public getApp(){
+        return this.expressApp;
     }
 
     private async testDB(){

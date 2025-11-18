@@ -13,7 +13,7 @@ export class OrderController {
         this.orderService = new OrderService();
     }
 
-     async answerController(res: Response, service: () => any, message: string){
+     /*async answerController(res: Response, service: () => any, message: string){
          try {
              let result = await service();
              //console.log("exports.form-result",form-result)
@@ -21,7 +21,7 @@ export class OrderController {
          } catch (e:any) {
              return res.status(500).json({ status: 500, message: e.message });
          }
-     }
+     }*/
 
      postOrder = async(req: Request, res: Response)=>{
 

@@ -14,7 +14,7 @@
     //"types": [],
     // For nodejs:
     // "lib": ["esnext"],
-    "types": ["node"],
+    "types": ["jest", "node", "supertest"],
     // and npm install -D @types/node
     //"moduleResolution": "node",
     // Other Outputs
@@ -48,5 +48,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
  //  "strictFunctionTypes": false
+   // "include": ["src/**/*", "tests/**/*"]
   }
 }
