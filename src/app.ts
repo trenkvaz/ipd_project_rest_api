@@ -29,17 +29,17 @@ class App {
     private expressApp: express.Application;
     //private env: string
     private port: string | number;
-
+    private server:any;
     constructor() {
         this.expressApp = express();
         this.port = process.env.PORT!.toString();
-        console.log("port",this.port);
+        console.log("port", this.port);
         console.log(typeof this.port);
         this.initExpressAppMiddlewares();
         this.initAuthorization();
         this.initRoutes();
         this.expressApp.use(ErrorMiddleware);
-        this.connectToDatabases();
+        //this.connectToDatabases();
         this.userRepository = new UserRepository();
         this.orderRepository = new OrderRepository();
     }
@@ -75,15 +75,33 @@ class App {
             next(new AppError("he he not found",404));
             //next(createError())
         });
-        const server = http.createServer(this.expressApp);
-        server.on('error', (error) => {
-            console.error('Error occurred:', error);
-            process.exit(1);
+        this.server = http.createServer(this.expressApp);
+        this.server.on('error', (error:any) => {
+            console.log('Error occurred:', error);
+            process.exit(0);
         });
-        server.listen(this.port, () => {
+        this.server.listen(this.port, () => {
             console.log(`Server is running on http://localhost:${this.port}`);
         });
+
+
+        /*process.on('SIGINT', () => {
+            console.log("Получен сигнал завершения. Приложение завершено.");
+            process.exit(0);
+        });*/
     }
+
+    public closeServer(){
+        this.server.close();
+    }
+    static async create() {
+        const app = new App();
+        app.listen();
+        await app.connectToDatabases();
+        return app;
+    }
+
+
 
     private async connectToDatabases() {
         try {
@@ -91,7 +109,8 @@ class App {
             await postgresConnection();
            // this.testDB();
         } catch (e) {
-            throw e
+            process.exit(1);
+
         }
     }
 

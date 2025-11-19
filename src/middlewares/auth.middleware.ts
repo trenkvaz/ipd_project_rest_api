@@ -79,6 +79,11 @@ export const authRouter = ()=>{
 export const authMiddleware =  (req: Request, res: Response, next: NextFunction) => {
     console.log("authMiddleware")
     passport.authenticate('jwt', { session: false }, (err: any, user: any, info: any) => {
+        //TODO test
+       /* req.user = "test"; // Установите пользователя
+        next(); // Продолжите к следующему обработчику"test"
+        return*/
+
         if (err) {
             next(new AppError('Ошибка авторизации: '+err.message,403));
         }
