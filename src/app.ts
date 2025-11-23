@@ -78,7 +78,7 @@ class App {
         this.server = http.createServer(this.expressApp);
         this.server.on('error', (error:any) => {
             console.log('Error occurred:', error);
-            process.exit(0);
+            //process.exit(0);
         });
         this.server.listen(this.port, () => {
             console.log(`Server is running on http://localhost:${this.port}`);
@@ -109,8 +109,9 @@ class App {
             await postgresConnection();
            // this.testDB();
         } catch (e) {
-            process.exit(1);
-
+            this.closeServer();
+            //process.exit(1);
+            throw e;
         }
     }
 

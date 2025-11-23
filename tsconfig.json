@@ -49,5 +49,6 @@
     "emitDecoratorMetadata": true,
  //  "strictFunctionTypes": false
    // "include": ["src/**/*", "tests/**/*"]
+   // "exclude": ["old"]
   }
 }
