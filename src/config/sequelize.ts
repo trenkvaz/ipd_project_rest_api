@@ -51,7 +51,8 @@ async function createDatabaseIfNotExists(){
 export const sequelize_db :Sequelize = new Sequelize(database, username, password, {
     host: host,
     port: port,
-    dialect: 'postgres'
+    dialect: 'postgres',
+    logging: false
 });
 const initModels = () => {
     OrderModel.initModel(sequelize_db);
@@ -62,4 +63,9 @@ export const postgresConnection = async () => {
     await sequelize_db.authenticate();
     initModels();
     await sequelize_db.sync({ force: true });
+}
+
+
+export const closePostgres = async () =>{
+    await sequelize_db.close();
 }

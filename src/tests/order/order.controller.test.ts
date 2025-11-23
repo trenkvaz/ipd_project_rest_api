@@ -3,7 +3,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import {OrderController} from "../../controllers/order.controller";
 import {OrderService} from "../../services/order.service";
-import { describe, it, expect, beforeEach,beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
 import {IOrder} from '../../types/order';
 
 let orderService = new OrderService();
@@ -32,7 +32,8 @@ beforeAll(async () => {
 
 afterAll(async () => {
     // Закрытие приложения, если это применимо
-    application.closeServer(); // Или другой метод очистки
+    console.log("afterAll")
+    await application.closeServer(); // Или другой метод очистки
 });
 
 const user_data = {
@@ -73,9 +74,10 @@ describe('Order Controller', () => {
     });
 
 
-
+    let orderIdPut = 0;
+    let createdAtPut = '';
     it('создание ордера', async () => {
-        const order1 = { "userId": "userId1", "amount": 1, "status": "pending",}
+        const order1 = { "userId": "userId1", "amount": 1, "status": "pending","test":"test"}
 
         const response = await request(app).post('/orders').send(order1).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
@@ -95,7 +97,30 @@ describe('Order Controller', () => {
         expect(createdAt).toBeInstanceOf(Date);
         expect(createdAt.getTime()).toBeGreaterThan(0);
         //expect(response.body).toEqual(order1);
+        orderIdPut = response.body.data.id;
+        createdAtPut = response.body.data.createdAt;
     });
+
+    it('изменение ордера', async () => {
+        const order1 = { "userId": "userId1", "amount": 1, "status": "canceled","test":"test"}
+
+        const response = await request(app).put(`/orders/${orderIdPut}`).send(order1).set('Authorization', "Bearer "+token);
+        console.log("response",JSON.stringify(response.text))
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            status: 200,
+            data: {
+                id: orderIdPut,
+                userId: 'userId1',
+                amount: 1,
+                status: 'canceled',
+                createdAt: createdAtPut
+            },
+            message: 'заказ изменен'
+        });
+    });
+
+
 
     /*it('should return all users', async () => {
         const order1:IOrder = {"id":1, "userId": "userId1", "amount": 1, "status": "pending",}

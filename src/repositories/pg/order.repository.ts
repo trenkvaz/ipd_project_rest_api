@@ -36,8 +36,24 @@ export default class OrderRepository {
 
     }
 
-    public async updateOrder(order:IOrder){
-        return (await OrderModel.update(order,{ where: {id:order.id},returning: true}));
+    public async updateOrder(order:IOrder,id:number){
+        console.log("updateOrder ",JSON.stringify(order))
+        try {
+            const [rowsUpdate, [updatedOrder]]  = await OrderModel.update(order,{ where: {id:id},returning: true});
+            //console.log("updateOrder res",JSON.stringify(res))
+
+            /*const { id, ...updateData } = order;
+
+            const [rowsUpdate, [updatedOrder]] = await OrderModel.update(updateData, {
+                where: { id },
+                returning: true,
+            });*/
+
+            return updatedOrder;
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
     }
 
     public async getOrderById(id: number){

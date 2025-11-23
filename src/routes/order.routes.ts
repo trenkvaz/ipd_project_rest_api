@@ -31,7 +31,7 @@ export class OrderRoutes {
         router.get(`${path}/`,this.testService);
         router.get(`${path}/:id`, this.testService);
         router.post(`${path}`,this.orderController.postOrder);
-        router.put(`${path}/:id`, this.testService);
+        router.put(`${path}/:id`,this.orderController.putOrder);
         router.delete(`${path}/:id`, this.testService);
 
         return router;

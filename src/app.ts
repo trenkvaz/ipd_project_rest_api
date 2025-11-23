@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import {mongoConnection} from "./config/mongoose";
-import {postgresConnection} from "./config/sequelize";
+import {mongoConnection,closeMongo} from "./config/mongoose";
+import {postgresConnection,closePostgres} from "./config/sequelize";
 import {IOrder} from './types/order';
 import {IUser} from './types/user';
 //import {creatOrder} from './repositories/pg/order.repository';
@@ -71,6 +71,7 @@ class App {
         /*this.expressApp.listen(this.port, () => {
             console.log("listen");
         })*/
+        console.log("server listen()")
         this.expressApp.use(function(req: Request, res: Response, next:NextFunction) {
             next(new AppError("he he not found",404));
             //next(createError())
@@ -91,8 +92,12 @@ class App {
         });*/
     }
 
-    public closeServer(){
+    public async closeServer(){
         this.server.close();
+        //console.log('MongoDB connection closed');
+        await closeMongo();
+        //console.log('PostgreSQL connection closed');
+        await closePostgres();
     }
     static async create() {
         const app = new App();
@@ -109,7 +114,7 @@ class App {
             await postgresConnection();
            // this.testDB();
         } catch (e) {
-            this.closeServer();
+            await this.closeServer();
             //process.exit(1);
             throw e;
         }

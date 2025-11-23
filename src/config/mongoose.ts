@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
-import { connect } from 'mongoose';
+import mongoose,{ connect } from 'mongoose';
 
 export const mongoConnection = async () => {
     const url: string = process.env.MONGO!;
@@ -11,3 +11,8 @@ export const mongoConnection = async () => {
         socketTimeoutMS: 5000});
     console.log("mongoConnection")
 };
+
+
+export const closeMongo = async ()=>{
+    await mongoose.connection.close();
+}
