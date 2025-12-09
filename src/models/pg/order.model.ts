@@ -1,5 +1,5 @@
 import {Model, DataTypes, Sequelize, Optional,ModelAttributes} from 'sequelize';
-import {sequelize_db} from '../../config/sequelize';
+//import {sequelize_db} from '../../config/sequelize';
 import {IOrder} from "../../types/order";
 import {SetOptions} from "sequelize/lib/model";
 /*
@@ -52,10 +52,14 @@ OrderModel.init(
     } as any
 );
 */
-
+/*id?: number;
+userId: string;
+amount: number;
+status: 'pending' | 'paid' | 'canceled';
+createdAt?: Date;*/
 
 // @ts-ignore
-export class OrderModel extends Model<IOrder> {
+export class OrderModel extends Model<IOrder>{
     declare id: number;
     declare userId: string;
     declare amount: number;
@@ -67,17 +71,21 @@ export class OrderModel extends Model<IOrder> {
     public status?: 'pending' | 'paid' | 'canceled';
     public createdAt?: Date;*/
     // @ts-ignore
-   // set (){};
-  //  setAttributes(){};
-
+    //override set (): {};
+    /*setAttributes(key: any, value: any): any {
+        return super.set(key, value);
+    }
+    set(key: any, value: any): any {
+        return super.set(key, value);
+    }*/
     // Пустые реализации методов
-    //set<K extends keyof IOrder>(key: K, value: IOrder[K], options?: SetOptions) {  };
-    //public set(keys: Partial<TModelAttributes>, options?: SetOptions): this;
+
     //setAttributes<K extends keyof OrderModel>(key: K, value: OrderModel[K], options?: SetOptions) {};
     //public setAttributes(keys: Partial<TModelAttributes>, options?: SetOptions): this;
 
 
         //return super.setAttributes(key, value, options);
+
     public static initModel(sequelize: Sequelize) {
         OrderModel.init(
             {
@@ -95,7 +103,8 @@ export class OrderModel extends Model<IOrder> {
                     allowNull: false,
                 },
                 status: {
-                    type: DataTypes.ENUM('pending', 'paid', 'canceled'),
+                    //type: DataTypes.ENUM('pending', 'paid', 'canceled'),
+                    type: DataTypes.STRING,
                     allowNull: false,
                 },
                 createdAt: {

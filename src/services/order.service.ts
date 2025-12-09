@@ -65,4 +65,49 @@ export class OrderService {
         }
 
     }
+
+    async getOrderById (id:number){
+        try {
+            const resOrder = await this.orderRepository.getOrderById(id);
+
+            return resOrder;
+        } catch (error:any) {
+            //console.log("ERROR")
+            if(error instanceof AppError)throw error
+            else throw new AppError('OrderService Ошибка получения заказа по ид: '+error.message,500);
+
+            //next(new AppError('Ошибка создания заказа: ',404));
+        }
+
+    }
+
+
+    async getOrders(page: number,offset:number,limit: number,userId:string){
+        try {
+            const resOrders = await this.orderRepository.getOrders(page, offset, limit,userId);
+            //console.log("resOrders "+JSON.stringify(resOrders))
+            return resOrders;
+        } catch (error:any) {
+            //console.log("ERROR")
+            if(error instanceof AppError)throw error
+            else throw new AppError('OrderService Ошибка получения заказов: '+error.message,500);
+
+            //next(new AppError('Ошибка создания заказа: ',404));
+        }
+    }
+
+
+    async deleteOrderById (id:number){
+        try {
+            const resOrder = await this.orderRepository.deleteOrderById(id);
+            return resOrder;
+        } catch (error:any) {
+            //console.log("ERROR")
+            if(error instanceof AppError)throw error
+            else throw new AppError('OrderService Ошибка удаления заказа по ид: '+error.message,500);
+
+            //next(new AppError('Ошибка создания заказа: ',404));
+        }
+
+    }
 }

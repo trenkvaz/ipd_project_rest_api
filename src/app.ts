@@ -17,6 +17,7 @@ import helmet from 'helmet'
 import hpp from 'hpp'
 //import {CreationAttributes} from "sequelize";
 import {OrderRoutes} from "./routes/order.routes";
+import {UserRoutes} from "./routes/user.routes";
 import {AppError, ErrorMiddleware} from "./middlewares/error.middleware";
 import passport ,{authRouter,authMiddleware} from "./middlewares/auth.middleware";
 import bodyParser from 'body-parser';
@@ -64,6 +65,7 @@ class App {
 
     private initRoutes() {
         this.expressApp.use('/', new OrderRoutes().getRouter());
+        this.expressApp.use('/', new UserRoutes().getRouter());
     }
 
     public listen() {
@@ -97,7 +99,7 @@ class App {
         //console.log('MongoDB connection closed');
         await closeMongo();
         //console.log('PostgreSQL connection closed');
-        await closePostgres();
+        await closePostgres(false);
     }
     static async create() {
         const app = new App();
@@ -108,10 +110,11 @@ class App {
 
 
 
+
     private async connectToDatabases() {
         try {
             await mongoConnection();
-            await postgresConnection();
+            await postgresConnection(false);
            // this.testDB();
         } catch (e) {
             await this.closeServer();
@@ -154,7 +157,7 @@ class App {
 
        // console.log(order1)
 
-        console.log((await this.orderRepository.getOrders(1,10,"userId1")))
+        console.log((await this.orderRepository.getOrders(1,10,10,"userId1")))
         const user:IUser = {
             name:"name",
             email:"email12",

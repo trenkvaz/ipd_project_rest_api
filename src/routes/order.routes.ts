@@ -28,11 +28,11 @@ export class OrderRoutes {
         const path = "/orders"
         const router = Router();
 
-        router.get(`${path}/`,this.testService);
-        router.get(`${path}/:id`, this.testService);
+        router.get(`${path}/`,this.orderController.getOrders);
+        router.get(`${path}/:id`, this.orderController.getOrder);
         router.post(`${path}`,this.orderController.postOrder);
         router.put(`${path}/:id`,this.orderController.putOrder);
-        router.delete(`${path}/:id`, this.testService);
+        router.delete(`${path}/:id`, this.orderController.deleteOrder);
 
         return router;
     }

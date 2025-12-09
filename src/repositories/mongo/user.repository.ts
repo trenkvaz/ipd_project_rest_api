@@ -1,20 +1,38 @@
 import {IUser} from "../../types/user";
 import UserModel from "../../models/mongo/user.model";
 import {Types} from 'mongoose';
+import {OrderModel} from "../../models/pg/order.model";
+import {AppError} from "../../middlewares/error.middleware";
 
 
 export default class UserRepository {
 
     public async creatUser(user:IUser){
+        try {
             return (await UserModel.create(user) as unknown as IUser);
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
+
     }
 
-    public async updateUser(user:IUser){
-        return (await UserModel.updateOne(user));
+    public async updateUser(user:IUser,_id: string){
+        try {
+            return (await UserModel.findOneAndUpdate({ _id: _id }, { $set: user } ,{ new: true } ));
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
     }
 
-    public async getUserById(id: Types.ObjectId | undefined){
-        return (await UserModel.findById(id) as unknown as IUser);
+    public async getUserById(id: Types.ObjectId | string){
+        try {
+            return (await UserModel.findById(id) as unknown as IUser);
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
     }
 
     public async deleteUserById(id: Types.ObjectId | undefined){

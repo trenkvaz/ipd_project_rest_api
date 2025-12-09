@@ -37,18 +37,9 @@ export default class OrderRepository {
     }
 
     public async updateOrder(order:IOrder,id:number){
-        console.log("updateOrder ",JSON.stringify(order))
+        //console.log("updateOrder ",JSON.stringify(order))
         try {
             const [rowsUpdate, [updatedOrder]]  = await OrderModel.update(order,{ where: {id:id},returning: true});
-            //console.log("updateOrder res",JSON.stringify(res))
-
-            /*const { id, ...updateData } = order;
-
-            const [rowsUpdate, [updatedOrder]] = await OrderModel.update(updateData, {
-                where: { id },
-                returning: true,
-            });*/
-
             return updatedOrder;
         } catch (error:any) {
             //console.log("ERROR")
@@ -57,18 +48,38 @@ export default class OrderRepository {
     }
 
     public async getOrderById(id: number){
-        return (await OrderModel.findAll({where: {id:id}}));
+        try {
+            const res  = await OrderModel.findOne({where: {id:id}});
+            //console.log("getOrderById "+JSON.stringify(res))
+            return res;
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
+
     }
 
     public async deleteOrderById(id: number){
-        return (await OrderModel.destroy({where: {id:id}}));
+        try {
+            return (await OrderModel.destroy({where: {id:id}}));
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
+
     }
 
-    public async getOrders(page: number, limit: number,userId: string) {
-        const offset = (page - 1) * limit;
-        const { count, rows } = await OrderModel.findAndCountAll({where: {userId:userId}, limit: limit, offset: offset});
-        return {total: count, orders: rows, page, totalPages: Math.ceil(count / limit),
-        };
+    public async getOrders(page: number,offset: number, limit: number,userId: string) {
+        //page,offset,limit,userId
+        //console.log("getOrders offset",offset,"")
+        try {
+            const { count, rows } = await OrderModel.findAndCountAll({where: {userId:userId}, limit: limit, offset: offset});
+            return {total: count, orders: rows, page:page, totalPages: Math.ceil(count / limit)};
+        } catch (error:any) {
+            //console.log("ERROR")
+            throw new AppError('Ошибка базы данных: ' + error.message,500);
+        }
+
     }
 
 }

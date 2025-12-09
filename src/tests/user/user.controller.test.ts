@@ -6,7 +6,7 @@ import {OrderService} from "../../services/order.service";
 import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
 import {IOrder} from '../../types/order';
 
-let orderService = new OrderService();
+//let orderService = new OrderService();
 
 /*const app = express();
 app.use(bodyParser.json());
@@ -14,6 +14,7 @@ let orderController = new OrderController();
 app.post('/orders', orderController.postOrder);*/
 //app.get('/users', listUsers);
 import App from "../../app";
+import {Types} from "mongoose";
 
 
 /*const app1 = new App();
@@ -41,18 +42,18 @@ const user_data = {
     password: "password11"
 };
 
-describe('Order Controller', () => {
-  /*  let app:express.Application;
-    beforeAll(async () => {
-        // Сброс массива пользователей перед каждым тестом
-        app = (await App.create()).getApp();
-        jest.clearAllMocks();
-    });
+describe('User Controller', () => {
+    /*  let app:express.Application;
+      beforeAll(async () => {
+          // Сброс массива пользователей перед каждым тестом
+          app = (await App.create()).getApp();
+          jest.clearAllMocks();
+      });
 
-    const user_data = {
-        "username": "user3",
-        "password": "password11"
-    }*/
+      const user_data = {
+          "username": "user3",
+          "password": "password11"
+      }*/
 
     it('регистрация', async () => {
         const response = await request(app).post('/register').send(user_data);
@@ -73,102 +74,108 @@ describe('Order Controller', () => {
         token = response.body.token;
     });
 
-
-    let orderIdPut = 0;
+  /*  _id?: Types.ObjectId;
+    name: string;
+    email: string;
+    profile?: Object;
+    createdAt?: Date;*/
+    let userId1 = "";
     let createdAtPut = '';
-    it('создание ордера', async () => {
-        const order1 = { "userId": "userId1", "amount": 1, "status": "pending","test":"test"}
+    it('добавление пользователя', async () => {
+        const user1 = { "name": "user1", "email": "email@user1", "profile": {t:"t"},"test":"test"}
 
-        const response = await request(app).post('/orders').send(order1).set('Authorization', "Bearer "+token);
+        const response = await request(app).post('/users').send(user1).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data: {
-                id: expect.any(Number), // Проверяем, что id — это число
-                userId: 'userId1',
-                amount: 1,
-                status: 'pending',
+                _id: expect.any(String), // Проверяем, что id — это число
+                name: 'user1',
+                email: "email@user1",
+                profile: {t:"t"},
                 createdAt: expect.any(String)
             },
-            message: 'заказ создан'
+            message: 'пользователь добавлен'
         });
         const createdAt = new Date(response.body.data.createdAt);
         expect(createdAt).toBeInstanceOf(Date);
         expect(createdAt.getTime()).toBeGreaterThan(0);
-        //expect(response.body).toEqual(order1);
-        orderIdPut = response.body.data.id;
+        //expect(response.body).toEqual(user1);
+        userId1 = response.body.data._id;
         createdAtPut = response.body.data.createdAt;
     });
-    let orderId2 = 0;
-    let createdAtPut2 = ''
-    it('создание ордера 2', async () => {
-        const order1 = { "userId": "userId1", "amount": 1, "status": "pending","test":"test"}
 
-        const response = await request(app).post('/orders').send(order1).set('Authorization', "Bearer "+token);
+
+    let userId2 = 0;
+    let createdAtPut2 = ''
+    it('добавление пользователя 2', async () => {
+        const user2 = { "name": "user2", "email": "email@user2", "profile": {t:"t1"},"test":"test"}
+
+        const response = await request(app).post('/users').send(user2).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data: {
-                id: expect.any(Number), // Проверяем, что id — это число
-                userId: 'userId1',
-                amount: 1,
-                status: 'pending',
+                _id: expect.any(String), // Проверяем, что id — это число
+                name: 'user2',
+                email: "email@user2",
+                profile: {t:"t1"},
                 createdAt: expect.any(String)
             },
-            message: 'заказ создан'
+            message: 'пользователь добавлен'
         });
         const createdAt = new Date(response.body.data.createdAt);
         expect(createdAt).toBeInstanceOf(Date);
         expect(createdAt.getTime()).toBeGreaterThan(0);
         //expect(response.body).toEqual(order1);
-        orderId2 = response.body.data.id;
+        userId2 = response.body.data._id;
         createdAtPut2 = response.body.data.createdAt;
     });
 
 
 
 
-    it('изменение ордера', async () => {
-        const order1 = { "userId": "userId1", "amount": 1, "status": "canceled","test":"test"}
+    it('обновление пользователя', async () => {
+        const user2 = { "name": "user2", "email": "email1@user2", "profile": {t:"t2"},"test":"test"}
 
-        const response = await request(app).put(`/orders/${orderId2}`).send(order1).set('Authorization', "Bearer "+token);
+        const response = await request(app).put(`/users/${userId2}`).send(user2).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data: {
-                id: orderId2,
-                userId: 'userId1',
-                amount: 1,
-                status: 'canceled',
+                _id: userId2,
+                name: 'user2',
+                email: "email1@user2",
+                profile: {t:"t2"},
                 createdAt: createdAtPut2
             },
-            message: 'заказ изменен'
+            message: 'пользователь обновлен'
         });
     });
 
-    it('получение ордера по ид', async () => {
+    it('получение пользователя по ид', async () => {
 
-        const response = await request(app).get(`/orders/${orderId2}`).set('Authorization', "Bearer "+token);
+        const response = await request(app).get(`/users/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data: {
-                id: orderId2,
-                userId: 'userId1',
-                amount: 1,
-                status: 'canceled',
+                _id: userId2,
+                name: 'user2',
+                email: "email1@user2",
+                profile: {t:"t2"},
                 createdAt: createdAtPut2
             },
-            message: 'заказ получен'
+            message: 'пользователь получен'
         });
     });
 
 
-    it('получение ордера по userId', async () => {
+    /*it('получение ордера по userId', async () => {
         let req = "?userId=userId1&page=1&limit=10";
         const response = await request(app).get(`/orders/${req}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
@@ -176,14 +183,14 @@ describe('Order Controller', () => {
         expect(response.body).toMatchObject({
             status: 200,
             data:{total: 2, orders: [{
-                    id: orderIdPut,
+                    id: userId1,
                     userId: 'userId1',
                     amount: 1,
                     status: 'pending',
                     createdAt: createdAtPut
                 },
                     {
-                        id: orderId2,
+                        id: userId2,
                         userId: 'userId1',
                         amount: 1,
                         status: 'canceled',
@@ -193,10 +200,10 @@ describe('Order Controller', () => {
                 ], page:1, totalPages: 1},
             message: 'заказы получены'
         });
-    });
+    });*/
 
-    it('удаление ордера по ид', async () => {
-        const response = await request(app).delete(`/orders/${orderId2}`).set('Authorization', "Bearer "+token);
+   /* it('удаление ордера по ид', async () => {
+        const response = await request(app).delete(`/orders/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
@@ -204,20 +211,7 @@ describe('Order Controller', () => {
             data:1,
             message: 'заказ удален'
         });
-    });
-
-
-    /*it('should return all users', async () => {
-        const order1:IOrder = {"id":1, "userId": "userId1", "amount": 1, "status": "pending",}
-        const order2:IOrder = {"id":2, "userId": "userId2", "amount": 1, "status": "paid",}
-
-        // Добавляем пользователей через сервис
-        orderService.createOrder(order1);
-        orderService.createOrder(order2);
-
-       /!* const response = await request(app).get('/users');
-
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual([order1, order2]);*!/
     });*/
+
+
 });

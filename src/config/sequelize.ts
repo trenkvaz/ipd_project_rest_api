@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import {Sequelize} from 'sequelize';
 import {OrderModel} from '../models/pg/order.model';
+import { newDb } from 'pg-mem';
 dotenv.config();
 
 const database:string = process.env.POSTGRES_DATABASE!.toString();
@@ -12,13 +13,13 @@ const port:number = Number(process.env.POSTGRES_PORT!);
 console.log("POSTGRES:");
 console.log("database",database,"username",username,"password",password,"host",host,"port",port)
 
-
+let dialectModule:any = undefined;
 async function createDatabaseIfNotExists(){
     const sequelize1 = new Sequelize({
         dialect: 'postgres',
         username: username,
         password: password,
-        host: host,
+        host: host
     });
     try {
         // Проверяем, существует ли база данных
@@ -48,7 +49,7 @@ async function createDatabaseIfNotExists(){
     console.log("createDatabaseIfNotExists()")
 }
 
-export const sequelize_db :Sequelize = new Sequelize(database, username, password, {
+const sequelize_db :Sequelize = new Sequelize(database, username, password, {
     host: host,
     port: port,
     dialect: 'postgres',
@@ -58,14 +59,67 @@ const initModels = () => {
     OrderModel.initModel(sequelize_db);
 };
 
-export const postgresConnection = async () => {
-    await createDatabaseIfNotExists();
-    await sequelize_db.authenticate();
-    initModels();
-    await sequelize_db.sync({ force: true });
+let sequelize_test:Sequelize;
+export const postgresConnection = async (isTest:boolean) => {
+    console.log("isTest",isTest)
+    if(isTest){
+        try {
+            const db = newDb();
+            //db.public.many(`CREATE TYPE enum_orders_status AS ENUM ('pending', 'completed', 'canceled');`);
+            /*sequelize_test = new Sequelize({
+                dialect: 'postgres',
+                dialectModule: db.adapters.createPg(),
+            });*/
+
+            sequelize_test = new Sequelize(database, username, password, {
+                host: host,
+                port: port,
+                dialect: 'postgres',
+                logging: false,
+                dialectModule: db.adapters.createPg()
+            });
+
+
+
+            await sequelize_test.authenticate();
+            console.log("Подключение к тестовой базе данных успешно!");
+
+            // const result = await sequelize_test.query(`
+            //     SELECT t.typname AS enum_name, array_agg(e.enumlabel ORDER BY enumsortorder) AS enum_value
+            //     FROM pg_type t
+            //     JOIN pg_enum e ON t.oid = e.enumtypid
+            //     JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+            //     WHERE n.nspname = 'public' AND t.typname = 'enum_orders_status'
+            //     GROUP BY 1;
+            // `);
+            // console.log("Перечисление:", result[0]);
+
+
+
+            // Инициализация модели
+            OrderModel.initModel(sequelize_test);
+            console.log("Инициализация модели данных успешно!");
+            // Синхронизация базы данных
+            await sequelize_test.sync({ force: true });
+            console.log("Синхронизация тестовой базы данных завершена!");
+
+            // Проверка существования перечисления
+
+
+        } catch (e:any) {
+            console.error("postgresConnection test error "+JSON.stringify(e))
+            throw e;
+        }
+    } else {
+        await createDatabaseIfNotExists();
+        await sequelize_db.authenticate();
+        initModels();
+        await sequelize_db.sync({ force: true });
+    }
 }
 
 
-export const closePostgres = async () =>{
+export const closePostgres = async (isTest:boolean) =>{
+    if(isTest)await sequelize_test.close();
     await sequelize_db.close();
 }
