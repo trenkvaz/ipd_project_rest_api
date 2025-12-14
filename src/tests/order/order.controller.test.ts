@@ -5,8 +5,8 @@ import {OrderController} from "../../controllers/order.controller";
 import {OrderService} from "../../services/order.service";
 import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
 import {IOrder} from '../../types/order';
-
-let orderService = new OrderService();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 /*const app = express();
 app.use(bodyParser.json());
@@ -15,25 +15,31 @@ app.post('/orders', orderController.postOrder);*/
 //app.get('/users', listUsers);
 import App from "../../app";
 
+let isDocker = false;
 
 /*const app1 = new App();
 
 app1.listen();*/
 let application:App;
-let app: express.Application;
+let app: express.Application | string;
 let token: string;
 
 beforeAll(async () => {
     // Сброс массива пользователей перед каждым тестом
-    application = await App.create();
-    app = application.getApp();
+    if(!isDocker){
+        application = await App.create();
+        app = application.getApp();
+    } else {
+        let port:string = process.env.PORT!.toString();
+        app = 'http://localhost:'+port;
+        console.log("app "+app)
+    }
     jest.clearAllMocks();
 });
 
 afterAll(async () => {
-    // Закрытие приложения, если это применимо
     console.log("afterAll")
-    await application.closeServer(); // Или другой метод очистки
+    if(!isDocker) await application.closeServer();
 });
 
 const user_data = {
@@ -127,7 +133,16 @@ describe('Order Controller', () => {
         createdAtPut2 = response.body.data.createdAt;
     });
 
-
+    it('удаление ордера по ид', async () => {
+        const response = await request(app).delete(`/orders/${orderId2}`).set('Authorization', "Bearer "+token);
+        console.log("response",JSON.stringify(response.text))
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            status: 200,
+            data:1,
+            message: 'заказ удален'
+        });
+    });
 
 
     it('изменение ордера', async () => {
@@ -168,7 +183,7 @@ describe('Order Controller', () => {
     });
 
 
-    it('получение ордера по userId', async () => {
+    it('получение ордеров по userId', async () => {
         let req = "?userId=userId1&page=1&limit=10";
         const response = await request(app).get(`/orders/${req}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))

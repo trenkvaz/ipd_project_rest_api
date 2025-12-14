@@ -5,7 +5,7 @@ import mongoose, {Model, Schema, InferSchemaType} from 'mongoose';
 const UserSchema: Schema<IUser> = new Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    profile: { type: Object, required: false }, // Измените на Object, если это не обязательно
+    profile: { type: Object, required: false },
     createdAt: { type: Date, default: Date.now }
 });
 

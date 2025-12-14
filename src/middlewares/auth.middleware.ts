@@ -15,7 +15,7 @@ const users: User[] = [
     { id: 2, username: 'user2', password: 'password2' }
 ];
 
-// Настройка стратегии JWT
+
 const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: 'your_jwt_secret' // Замените на свой секрет
@@ -32,8 +32,6 @@ passport.use(new Strategy(opts, (jwtPayload, done) => {
 export const authRouter = ()=>{
     const router = Router();
     router.post('/login', async (req: Request, res: Response) => {
-        //console.log("reg is ",(req instanceof Request))
-        console.log("req",req.body)
         const { username, password } = req.body;
 
         const user = users.find(user => user.username === username);
@@ -46,12 +44,9 @@ export const authRouter = ()=>{
             return res.status(400).json({ message: 'Неверное имя пользователя или пароль' });
         }
 
-        //if (user) {
-            const token = jwt.sign({ id: user.id }, opts.secretOrKey, { expiresIn: '1h' });
-            return res.json({ token:token });
-       /* } else {
-            return res.status(401).json({ message: 'Неверные учетные данные' });
-        }*/
+
+        const token = jwt.sign({ id: user.id }, opts.secretOrKey, { expiresIn: '1h' });
+        return res.json({ token:token });
     });
 
     router.post('/register', async (req: Request, res: Response) => {
@@ -68,33 +63,26 @@ export const authRouter = ()=>{
             username,
             password: hashedPassword,
         };
-
         users.push(newUser);
         res.status(201).json({ message: 'Пользователь успешно зарегистрирован' });
     });
-
     return router;
 }
 
 export const authMiddleware =  (req: Request, res: Response, next: NextFunction) => {
-    console.log("authMiddleware")
     passport.authenticate('jwt', { session: false }, (err: any, user: any, info: any) => {
         //TODO test
        /* req.user = "test"; // Установите пользователя
         next(); // Продолжите к следующему обработчику"test"
         return*/
-
         if (err) {
             next(new AppError('Ошибка авторизации: '+err.message,403));
         }
         if (!user) {
-            // Здесь можно обрабатывать запрос без аутентификации
-            /*req.user = "test user"; // Установите пользователя как null
-            next();*/
-            next(new AppError('Отсутствует или неправильный токен авторизации',403)); // Продолжите к следующему обработчику
+            next(new AppError('Отсутствует или неправильный токен авторизации',403));
         } else {
-            req.user = user; // Установите пользователя
-            next(); // Продолжите к следующему обработчику
+            req.user = user;
+            next();
         }
     })(req, res, next);
 };

@@ -2,6 +2,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 import mongoose,{ connect } from 'mongoose';
 import UserModel from "../models/mongo/user.model";
+
+const testDB:boolean = Boolean(process.env.TEST_DB!)
 export const mongoConnection = async () => {
     const url: string = process.env.MONGO!;
     const nameDB: string = process.env.MONGO_DB!;
@@ -10,7 +12,8 @@ export const mongoConnection = async () => {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 5000});
     console.log("mongoConnection")
-    clearCollection();
+
+    if(testDB) clearCollection();
 };
 
 

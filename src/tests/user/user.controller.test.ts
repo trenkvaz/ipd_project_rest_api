@@ -5,7 +5,8 @@ import {OrderController} from "../../controllers/order.controller";
 import {OrderService} from "../../services/order.service";
 import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
 import {IOrder} from '../../types/order';
-
+import * as dotenv from 'dotenv';
+dotenv.config();
 //let orderService = new OrderService();
 
 /*const app = express();
@@ -16,25 +17,33 @@ app.post('/orders', orderController.postOrder);*/
 import App from "../../app";
 import {Types} from "mongoose";
 
-
+let isDocker = false;
 /*const app1 = new App();
 
 app1.listen();*/
 let application:App;
-let app: express.Application;
+let app: express.Application | string;
 let token: string;
 
+
+'http://localhost:3100/api-docs/api/users'
 beforeAll(async () => {
     // Сброс массива пользователей перед каждым тестом
-    application = await App.create();
-    app = application.getApp();
+    if(!isDocker){
+        application = await App.create();
+        app = application.getApp();
+    } else {
+        let port:string = process.env.PORT!.toString();
+        app = 'http://localhost:'+port;
+        console.log("app "+app)
+    }
     jest.clearAllMocks();
 });
 
 afterAll(async () => {
     // Закрытие приложения, если это применимо
     console.log("afterAll")
-    await application.closeServer(); // Или другой метод очистки
+    if(!isDocker) await application.closeServer(); // Или другой метод очистки
 });
 
 const user_data = {
@@ -134,7 +143,16 @@ describe('User Controller', () => {
         createdAtPut2 = response.body.data.createdAt;
     });
 
-
+    it('удаление пользователя по ид', async () => {
+        const response = await request(app).delete(`/users/${userId2}`).set('Authorization', "Bearer "+token);
+        console.log("response",JSON.stringify(response.text))
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            status: 200,
+            data:{acknowledged:true,deletedCount:1},
+            message: 'пользователь удален'
+        });
+    });
 
 
     it('обновление пользователя', async () => {
@@ -175,43 +193,43 @@ describe('User Controller', () => {
     });
 
 
-    /*it('получение ордера по userId', async () => {
-        let req = "?userId=userId1&page=1&limit=10";
-        const response = await request(app).get(`/orders/${req}`).set('Authorization', "Bearer "+token);
+    it('получение пользователей', async () => {
+        let req = "?page=1&limit=10";
+        const response = await request(app).get(`/users/${req}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
-            data:{total: 2, orders: [{
-                    id: userId1,
-                    userId: 'userId1',
-                    amount: 1,
-                    status: 'pending',
+            data:{total: 2, users: [{
+                    _id: userId1, // Проверяем, что id — это число
+                    name: 'user1',
+                    email: "email@user1",
+                    profile: {t:"t"},
                     createdAt: createdAtPut
                 },
                     {
-                        id: userId2,
-                        userId: 'userId1',
-                        amount: 1,
-                        status: 'canceled',
+                        _id: userId2,
+                        name: 'user2',
+                        email: "email1@user2",
+                        profile: {t:"t2"},
                         createdAt: createdAtPut2
                     }
 
                 ], page:1, totalPages: 1},
-            message: 'заказы получены'
+            message: 'пользователи получены'
         });
-    });*/
+    });
 
-   /* it('удаление ордера по ид', async () => {
-        const response = await request(app).delete(`/orders/${userId2}`).set('Authorization', "Bearer "+token);
+
+    it('удаление пользователя по ид', async () => {
+        const response = await request(app).delete(`/users/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
-            data:1,
-            message: 'заказ удален'
+            data:{acknowledged:true,deletedCount:1},
+            message: 'пользователь удален'
         });
-    });*/
-
+    });
 
 });

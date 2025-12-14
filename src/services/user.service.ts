@@ -69,7 +69,7 @@ export class UserService {
     async getUserById (id:string){
         try {
             const res = await this.userRepository.getUserById(id);
-
+            //console.log("getUserById res "+JSON.stringify(res))
             return res;
         } catch (error:any) {
             //console.log("ERROR")
@@ -82,29 +82,26 @@ export class UserService {
     }
 
 
-    async getOrders(page: number,offset:number,limit: number,userId:string){
+    async getUsers(page: number,offset:number,limit: number){
         try {
-            //const resOrders = await this.userRepository.getOrders(page, offset, limit,userId);
-            //console.log("resOrders "+JSON.stringify(resOrders))
-            //return resOrders;
+            return (await this.userRepository.getUsers(page, offset, limit));
         } catch (error:any) {
             //console.log("ERROR")
             if(error instanceof AppError)throw error
-            else throw new AppError('UserService Ошибка получения заказов: '+error.message,500);
+            else throw new AppError('UserService Ошибка получения пользователей: '+error.message,500);
 
             //next(new AppError('Ошибка создания заказа: ',404));
         }
     }
 
 
-    async deleteOrderById (id:number){
+    async deleteUserById (id:string ){
         try {
-            //const resOrder = await this.userRepository.deleteOrderById(id);
-            //return resOrder;
+            return (await this.userRepository.deleteUserById(id));
         } catch (error:any) {
             //console.log("ERROR")
             if(error instanceof AppError)throw error
-            else throw new AppError('UserService Ошибка удаления заказа по ид: '+error.message,500);
+            else throw new AppError('UserService Ошибка удаления пользователя по ид: '+error.message,500);
 
             //next(new AppError('Ошибка создания заказа: ',404));
         }
