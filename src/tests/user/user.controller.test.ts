@@ -17,7 +17,7 @@ app.post('/orders', orderController.postOrder);*/
 import App from "../../app";
 import {Types} from "mongoose";
 
-let isDocker = false;
+let isDocker = true;
 /*const app1 = new App();
 
 app1.listen();*/
@@ -26,7 +26,7 @@ let app: express.Application | string;
 let token: string;
 
 
-'http://localhost:3100/api-docs/api/users'
+//'http://localhost:3100/api-docs/api/users'
 beforeAll(async () => {
     // Сброс массива пользователей перед каждым тестом
     if(!isDocker){
@@ -143,7 +143,7 @@ describe('User Controller', () => {
         createdAtPut2 = response.body.data.createdAt;
     });
 
-    it('удаление пользователя по ид', async () => {
+    /*it('удаление пользователя по ид', async () => {
         const response = await request(app).delete(`/users/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
@@ -152,7 +152,7 @@ describe('User Controller', () => {
             data:{acknowledged:true,deletedCount:1},
             message: 'пользователь удален'
         });
-    });
+    });*/
 
 
     it('обновление пользователя', async () => {

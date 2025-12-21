@@ -93,6 +93,7 @@ class App {
 
     private async connectToDatabases() {
         try {
+            console.log("connectToDatabases()")
             await mongoConnection();
             await postgresConnection();
         } catch (e) {

@@ -14,11 +14,13 @@ WORKDIR /app
 
 EXPOSE 3100
 
-COPY wait-for-it.sh /app/wait-for-it.sh
-RUN chmod +x /app/wait-for-it.sh
+#COPY wait-for-postgres.sh /app/wait-for-postgres.sh
+#RUN chmod +x /app/wait-for-postgres.sh
 
 # Указываем команду для запуска вашего приложения с ожиданием
-CMD ["./wait-for-it.sh", "postgres_db:5432", "--", "npm", "start"]
+#CMD ["./wait-for-postgres.sh","postgres_db:5432","--","npm", "start"]
+
+CMD ["npm", "run", "start"]
 
 # Cmd script
 

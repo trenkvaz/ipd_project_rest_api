@@ -8,7 +8,12 @@ export class OrderRoutes {
     constructor() {
         this.orderController = new OrderController();
     }
-
+    /**
+     * @swagger
+     * tags:
+     *   name: Orders
+     *   description: Управление заказами
+     */
 
     getRouter(): Router{
         const path = "/orders"

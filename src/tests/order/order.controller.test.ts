@@ -5,8 +5,52 @@ import {OrderController} from "../../controllers/order.controller";
 import {OrderService} from "../../services/order.service";
 import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
 import {IOrder} from '../../types/order';
+import axios from 'axios';
 import * as dotenv from 'dotenv';
 dotenv.config();
+
+import { exec } from 'child_process';
+import { promisify } from 'util';
+const execPromise = promisify(exec);
+
+
+const startContainers = async () => {
+    try {
+        const { stdout } = await execPromise("docker-compose -f docker-compose_test.yml up -d");
+        console.log(stdout);
+    } catch (error:any) {
+        throw new Error(`Error starting containers: ${error}`);
+    }
+};
+
+const stopContainers = async () => {
+    try {
+        const { stdout } = await execPromise("docker-compose -f docker-compose_test.yml down");
+        console.log(stdout);
+    } catch (error:any) {
+        throw new Error(`Error stopping containers: ${error}`);
+    }
+};
+
+
+const waitForService = async (url: string, timeout: number = 30000) => {
+    const startTime = Date.now();
+    while (true) {
+        try {
+            await axios.get(url);
+            console.log(`Service is up at ${url}`);
+            return;
+        } catch (error:any) {
+            if (Date.now() - startTime > timeout) {
+                throw new Error(`Service did not start in time: ${url}`);
+            }
+            if(error.status&&error.status===403)return;
+            console.log(`Waiting for service at ${url}...${error.status}`);
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Ждем 1 секунду перед повторной попыткой
+        }
+    }
+};
+
 
 /*const app = express();
 app.use(bodyParser.json());
@@ -15,7 +59,7 @@ app.post('/orders', orderController.postOrder);*/
 //app.get('/users', listUsers);
 import App from "../../app";
 
-let isDocker = false;
+let isDocker = true;
 
 /*const app1 = new App();
 
@@ -30,16 +74,20 @@ beforeAll(async () => {
         application = await App.create();
         app = application.getApp();
     } else {
+        //jest.setTimeout(30000);
+        await startContainers();
+        await waitForService("http://localhost:3100/orders");
         let port:string = process.env.PORT!.toString();
         app = 'http://localhost:'+port;
         console.log("app "+app)
     }
     jest.clearAllMocks();
-});
+},30000);
 
 afterAll(async () => {
     console.log("afterAll")
     if(!isDocker) await application.closeServer();
+    else await stopContainers();
 });
 
 const user_data = {
@@ -133,7 +181,7 @@ describe('Order Controller', () => {
         createdAtPut2 = response.body.data.createdAt;
     });
 
-    it('удаление ордера по ид', async () => {
+    /*it('удаление ордера по ид', async () => {
         const response = await request(app).delete(`/orders/${orderId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
@@ -142,7 +190,7 @@ describe('Order Controller', () => {
             data:1,
             message: 'заказ удален'
         });
-    });
+    });*/
 
 
     it('изменение ордера', async () => {

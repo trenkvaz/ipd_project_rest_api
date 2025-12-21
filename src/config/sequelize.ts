@@ -1,6 +1,7 @@
-import * as dotenv from 'dotenv';
 import {Sequelize} from 'sequelize';
 import {OrderModel} from '../models/pg/order.model';
+
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 const database:string = process.env.POSTGRES_DATABASE!.toString();
@@ -8,12 +9,14 @@ const username:string = process.env.POSTGRES_USER!.toString();
 const password:string = process.env.POSTGRES_PASSWORD!.toString();
 const host:string = process.env.POSTGRES_HOST!.toString();
 const port:number = Number(process.env.POSTGRES_PORT!);
-const testDB:boolean = Boolean(process.env.TEST_DB!)
+
+const clearDB:boolean = process.env.CLEAR_DB==='true'
 //console.log(typeof password);
 console.log("POSTGRES:");
-console.log("database",database,"username",username,"password",password,"host",host,"port",port)
+console.log("process.env.CLEAR_DB",process.env.CLEAR_DB)
+console.log("database:",database,"username:",username,"password:",password,"host:",host,"port:",port,"clearDB:",clearDB)
 
-let dialectModule:any = undefined;
+
 async function createDatabaseIfNotExists(){
     const sequelize1 = new Sequelize({
         dialect: 'postgres',
@@ -54,6 +57,7 @@ const sequelize_db :Sequelize = new Sequelize(database, username, password, {
     dialect: 'postgres',
     logging: false
 });
+
 const initModels = () => {
     OrderModel.initModel(sequelize_db);
 };
@@ -64,9 +68,10 @@ export const postgresConnection = async () => {
         await createDatabaseIfNotExists();
         await sequelize_db.authenticate();
         initModels();
-        if(testDB)
-        await sequelize_db.sync({ force: true });
+        console.log(" postgresConnection clearDB "+clearDB)
+        if(clearDB) await sequelize_db.sync({ force: true });
         else await sequelize_db.sync({ alter: true });
+    //{ alter: true }
 
 }
 
