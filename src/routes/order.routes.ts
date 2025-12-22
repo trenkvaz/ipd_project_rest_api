@@ -14,7 +14,6 @@ export class OrderRoutes {
      *   name: Orders
      *   description: Управление заказами
      */
-
     getRouter(): Router{
         const path = "/orders"
         const router = Router();
@@ -25,6 +24,8 @@ export class OrderRoutes {
          *   post:
          *     summary: Создать новый заказ
          *     tags: [Orders]
+         *     security:
+         *       - Bearer: []
          *     requestBody:
          *       required: true
          *       content:
@@ -78,6 +79,8 @@ export class OrderRoutes {
          *         description: Ошибка валидации данных
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -86,6 +89,8 @@ export class OrderRoutes {
          *   put:
          *     summary: Изменить заказ
          *     tags: [Orders]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - name: id
          *         in: path
@@ -148,6 +153,8 @@ export class OrderRoutes {
          *         description: Ошибка валидации данных
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -156,6 +163,8 @@ export class OrderRoutes {
          *   get:
          *     summary: Получить список заказов с пагинацией
          *     tags: [Orders]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - name: userId
          *         in: query
@@ -224,6 +233,8 @@ export class OrderRoutes {
          *                   example: 'заказы получены'
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -232,6 +243,8 @@ export class OrderRoutes {
          *   get:
          *     summary: Получить заказ по ID
          *     tags: [Orders]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - name: id
          *         in: path
@@ -276,6 +289,8 @@ export class OrderRoutes {
          *         description: Заказ не найден
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -284,6 +299,8 @@ export class OrderRoutes {
          *   delete:
          *     summary: Удалить заказ по ID
          *     tags: [Orders]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - name: id
          *         in: path
@@ -296,6 +313,8 @@ export class OrderRoutes {
          *         description: Пользователь успешно удален
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         router.get(`${path}/`,this.orderController.getOrders);

@@ -1,10 +1,10 @@
-import {NextFunction, Request, Response} from "express";
+import { Request, Response} from "express";
 import {IUser} from '../types/user';
 import {UserService} from "../services/user.service";
 import {AppError} from "../middlewares/error.middleware";
-import {IsDate, IsEnum, IsInt, IsObject, IsOptional, IsPositive, IsString, validate} from 'class-validator';
+import {IsDate, IsObject, IsOptional, IsString, validate} from 'class-validator';
 import { plainToInstance} from 'class-transformer';
-import {Types} from "mongoose";
+
 
 export class UserController {
 
@@ -90,9 +90,6 @@ export class UserController {
 
 
 class UserDto implements IUser{
-   /* @IsOptional()
-    @IsString()
-    _id?: string;*/
 
     @IsString()
     name!: string;
@@ -109,9 +106,4 @@ class UserDto implements IUser{
     createdAt?: Date;
 }
 
-/*
-_id?: Types.ObjectId;
-name: string;
-email: string;
-profile?: Object;
-createdAt?: Date;*/
+

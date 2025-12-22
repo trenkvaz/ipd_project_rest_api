@@ -1,23 +1,20 @@
 import request from 'supertest';
 import express from 'express';
-import bodyParser from 'body-parser';
-import {OrderController} from "../../controllers/order.controller";
-import {OrderService} from "../../services/order.service";
 import { describe, it, expect, beforeEach,beforeAll,afterAll } from '@jest/globals';
-import {IOrder} from '../../types/order';
+import App from "../../app";
 import axios from 'axios';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import supertest from "supertest";
 const execPromise = promisify(exec);
 
 
 const startContainers = async () => {
     try {
-        const { stdout } = await execPromise("docker-compose -f docker-compose_test.yml up -d");
-        console.log(stdout);
+        await execPromise("docker-compose -f docker-compose_test.yml up -d");
     } catch (error:any) {
         throw new Error(`Error starting containers: ${error}`);
     }
@@ -25,8 +22,7 @@ const startContainers = async () => {
 
 const stopContainers = async () => {
     try {
-        const { stdout } = await execPromise("docker-compose -f docker-compose_test.yml down");
-        console.log(stdout);
+        await execPromise("docker-compose -f docker-compose_test.yml down");
     } catch (error:any) {
         throw new Error(`Error stopping containers: ${error}`);
     }
@@ -38,32 +34,24 @@ const waitForService = async (url: string, timeout: number = 30000) => {
     while (true) {
         try {
             await axios.get(url);
-            console.log(`Service is up at ${url}`);
+            console.log(`Сервис запущен! ${url}`);
             return;
         } catch (error:any) {
             if (Date.now() - startTime > timeout) {
-                throw new Error(`Service did not start in time: ${url}`);
+                throw new Error(`Сервис не смог запуститься за отведенное время: ${url}`);
             }
             if(error.status&&error.status===403)return;
-            console.log(`Waiting for service at ${url}...${error.status}`);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Ждем 1 секунду перед повторной попыткой
+            console.log(`Ожидание запуска сервиса ${url}...${error.status}`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
     }
 };
-//let orderService = new OrderService();
 
-/*const app = express();
-app.use(bodyParser.json());
-let orderController = new OrderController();
-app.post('/orders', orderController.postOrder);*/
-//app.get('/users', listUsers);
-import App from "../../app";
-import {Types} from "mongoose";
+
+
 
 let isDocker = true;
-/*const app1 = new App();
 
-app1.listen();*/
 let application:App;
 let app: express.Application | string;
 let token: string;
@@ -71,23 +59,20 @@ let token: string;
 
 //'http://localhost:3100/api-docs/api/users'
 beforeAll(async () => {
-    // Сброс массива пользователей перед каждым тестом
+
     if(!isDocker){
         application = await App.create();
         app = application.getApp();
     } else {
-        //jest.setTimeout(30000);
         await startContainers();
         await waitForService("http://localhost:3100/orders");
         let port:string = process.env.PORT!.toString();
         app = 'http://localhost:'+port;
-        console.log("app "+app)
     }
     jest.clearAllMocks();
 },30000);
 
 afterAll(async () => {
-    console.log("afterAll")
     if(!isDocker) await application.closeServer();
     else await stopContainers();
 });
@@ -98,29 +83,19 @@ const user_data = {
 };
 
 describe('User Controller', () => {
-    /*  let app:express.Application;
-      beforeAll(async () => {
-          // Сброс массива пользователей перед каждым тестом
-          app = (await App.create()).getApp();
-          jest.clearAllMocks();
-      });
 
-      const user_data = {
-          "username": "user3",
-          "password": "password11"
-      }*/
 
     it('регистрация', async () => {
+        // @ts-ignore
         const response = await request(app).post('/register').send(user_data);
         //console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(201);
         expect(response.body).toEqual({"message": "Пользователь успешно зарегистрирован"});
     });
 
-    //let token:string;
 
     it('получение токена', async () => {
-
+        // @ts-ignore
         const response = await request(app).post('/login').send(user_data);
         console.log("response",JSON.stringify(response.text))
 
@@ -129,23 +104,19 @@ describe('User Controller', () => {
         token = response.body.token;
     });
 
-  /*  _id?: Types.ObjectId;
-    name: string;
-    email: string;
-    profile?: Object;
-    createdAt?: Date;*/
+
     let userId1 = "";
     let createdAtPut = '';
     it('добавление пользователя', async () => {
         const user1 = { "name": "user1", "email": "email@user1", "profile": {t:"t"},"test":"test"}
-
+        // @ts-ignore
         const response = await request(app).post('/users').send(user1).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data: {
-                _id: expect.any(String), // Проверяем, что id — это число
+                _id: expect.any(String),
                 name: 'user1',
                 email: "email@user1",
                 profile: {t:"t"},
@@ -166,7 +137,7 @@ describe('User Controller', () => {
     let createdAtPut2 = ''
     it('добавление пользователя 2', async () => {
         const user2 = { "name": "user2", "email": "email@user2", "profile": {t:"t1"},"test":"test"}
-
+        // @ts-ignore
         const response = await request(app).post('/users').send(user2).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
@@ -189,21 +160,10 @@ describe('User Controller', () => {
         createdAtPut2 = response.body.data.createdAt;
     });
 
-    /*it('удаление пользователя по ид', async () => {
-        const response = await request(app).delete(`/users/${userId2}`).set('Authorization', "Bearer "+token);
-        console.log("response",JSON.stringify(response.text))
-        expect(response.status).toBe(200);
-        expect(response.body).toMatchObject({
-            status: 200,
-            data:{acknowledged:true,deletedCount:1},
-            message: 'пользователь удален'
-        });
-    });*/
-
 
     it('обновление пользователя', async () => {
         const user2 = { "name": "user2", "email": "email1@user2", "profile": {t:"t2"},"test":"test"}
-
+        // @ts-ignore
         const response = await request(app).put(`/users/${userId2}`).send(user2).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
@@ -221,7 +181,7 @@ describe('User Controller', () => {
     });
 
     it('получение пользователя по ид', async () => {
-
+        // @ts-ignore
         const response = await request(app).get(`/users/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
@@ -241,13 +201,14 @@ describe('User Controller', () => {
 
     it('получение пользователей', async () => {
         let req = "?page=1&limit=10";
+        // @ts-ignore
         const response = await request(app).get(`/users/${req}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);
         expect(response.body).toMatchObject({
             status: 200,
             data:{total: 2, users: [{
-                    _id: userId1, // Проверяем, что id — это число
+                    _id: userId1,
                     name: 'user1',
                     email: "email@user1",
                     profile: {t:"t"},
@@ -268,6 +229,7 @@ describe('User Controller', () => {
 
 
     it('удаление пользователя по ид', async () => {
+        // @ts-ignore
         const response = await request(app).delete(`/users/${userId2}`).set('Authorization', "Bearer "+token);
         console.log("response",JSON.stringify(response.text))
         expect(response.status).toBe(200);

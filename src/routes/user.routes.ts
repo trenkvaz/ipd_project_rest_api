@@ -23,6 +23,8 @@ export class UserRoutes {
          *   get:
          *     summary: Получить список пользователей с пагинацией
          *     tags: [Users]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - name: page
          *         in: query
@@ -88,6 +90,8 @@ export class UserRoutes {
          *                   example: 'пользователи получены'
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -96,6 +100,8 @@ export class UserRoutes {
          *   get:
          *     summary: Получить пользователя по ID
          *     tags: [Users]
+         *     security:
+         *       - Bearer: []
          *     description: Возвращает данные пользователя по указанному идентификатору.
          *     parameters:
          *       - in: path
@@ -144,6 +150,8 @@ export class UserRoutes {
          *         description: Пользователь не найден
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -152,6 +160,8 @@ export class UserRoutes {
          *   post:
          *     summary: Создать нового пользователя
          *     tags: [Users]
+         *     security:
+         *       - Bearer: []
          *     description: Создает нового пользователя и возвращает его данные.
          *     requestBody:
          *       required: true
@@ -202,6 +212,8 @@ export class UserRoutes {
          *         description: Ошибка валидации данных
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -210,6 +222,8 @@ export class UserRoutes {
          *   put:
          *     summary: Обновить пользователя по ID
          *     tags: [Users]
+         *     security:
+         *       - Bearer: []
          *     description: Обновляет данные существующего пользователя и возвращает обновленные данные.
          *     parameters:
          *       - in: path
@@ -269,6 +283,8 @@ export class UserRoutes {
          *         description: Ошибка валидации данных
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         /**
@@ -277,6 +293,8 @@ export class UserRoutes {
          *   delete:
          *     summary: Удалить пользователя по ID
          *     tags: [Users]
+         *     security:
+         *       - Bearer: []
          *     parameters:
          *       - in: path
          *         name: id
@@ -289,6 +307,8 @@ export class UserRoutes {
          *         description: Пользователь успешно удален
          *       500:
          *         description: Ошибка сервера
+         *       403:
+         *         description: Ошибка авторизации
          */
 
         router.get(`${path}/`,this.userController.getUsers);

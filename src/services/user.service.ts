@@ -12,73 +12,29 @@ export class UserService {
 
     async createUser (user:IUser){
         try {
-            const res = await this.userRepository.creatUser(user);
-            //resOrder.dataValues.id = undefined;
-            //if(resOrder === undefined)throw new AppError('Order creation failed: id or createdAt is undefined',404);
-            /*if (resOrder === undefined || resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
-                //next(new AppError('Order creation failed: id or createdAt is undefined',404));
-                throw new AppError('Order creation failed: id or createdAt is undefined',404);
-            }
-            const order1: IOrder = {
-                id: resOrder.dataValues.id,
-                userId: resOrder.dataValues.userId,
-                amount: resOrder.dataValues.amount,
-                status: resOrder.dataValues.status,
-                createdAt: resOrder.dataValues.createdAt
-            };*/
-            //return resOrder;
-            return res;
+            return (await this.userRepository.creatUser(user));
         } catch (error:any) {
-            //console.log("ERROR")
             if(error instanceof AppError)throw error
             else throw new AppError('UserService Ошибка добавления пользователя: '+error.message,500);
-
-            //next(new AppError('Ошибка создания заказа: ',404));
         }
-
     }
 
     async updateUser (user:IUser,_id:string){
         try {
-            const res = await this.userRepository.updateUser(user,_id);
-            //resOrder.dataValues.id = undefined;
-            //if(resOrder === undefined)throw new AppError('Order creation failed: id or createdAt is undefined',404);
-            /*if (resOrder === undefined || resOrder.dataValues.id === undefined || resOrder.dataValues.createdAt === undefined) {
-                //next(new AppError('Order creation failed: id or createdAt is undefined',404));
-                throw new AppError('Order creation failed: id or createdAt is undefined',404);
-            }
-            const order1: IOrder = {
-                id: resOrder.dataValues.id,
-                userId: resOrder.dataValues.userId,
-                amount: resOrder.dataValues.amount,
-                status: resOrder.dataValues.status,
-                createdAt: resOrder.dataValues.createdAt
-            };*/
-            //return resOrder;
-            return res;
+            return (await this.userRepository.updateUser(user,_id));
         } catch (error:any) {
-            //console.log("ERROR")
             if(error instanceof AppError)throw error
             else throw new AppError('UserService Ошибка обновления пользователя: '+error.message,500);
-
-            //next(new AppError('Ошибка создания заказа: ',404));
         }
-
     }
 
     async getUserById (id:string){
         try {
-            const res = await this.userRepository.getUserById(id);
-            //console.log("getUserById res "+JSON.stringify(res))
-            return res;
+            return (await this.userRepository.getUserById(id));
         } catch (error:any) {
-            //console.log("ERROR")
             if(error instanceof AppError)throw error
             else throw new AppError('UserService Ошибка получения пользователя по ид: '+error.message,500);
-
-            //next(new AppError('Ошибка создания заказа: ',404));
         }
-
     }
 
 
@@ -86,11 +42,8 @@ export class UserService {
         try {
             return (await this.userRepository.getUsers(page, offset, limit));
         } catch (error:any) {
-            //console.log("ERROR")
             if(error instanceof AppError)throw error
             else throw new AppError('UserService Ошибка получения пользователей: '+error.message,500);
-
-            //next(new AppError('Ошибка создания заказа: ',404));
         }
     }
 
@@ -99,12 +52,8 @@ export class UserService {
         try {
             return (await this.userRepository.deleteUserById(id));
         } catch (error:any) {
-            //console.log("ERROR")
             if(error instanceof AppError)throw error
             else throw new AppError('UserService Ошибка удаления пользователя по ид: '+error.message,500);
-
-            //next(new AppError('Ошибка создания заказа: ',404));
         }
-
     }
 }

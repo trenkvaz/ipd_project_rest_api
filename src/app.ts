@@ -65,16 +65,15 @@ class App {
 
     public listen() {
 
-        console.log("server listen()")
         this.expressApp.use(function(req: Request, res: Response, next:NextFunction) {
-            next(new AppError("he he not found",404));
+            next(new AppError("хе хе хе не нашлось",404));
         });
         this.server = http.createServer(this.expressApp);
         this.server.on('error', (error:any) => {
-            console.log('Error occurred:', error);
+            console.log('Ошибка сервера:', error);
         });
         this.server.listen(this.port, () => {
-            console.log(`Server is running on http://localhost:${this.port}`);
+            console.log(`Сервер запущен на http://localhost:${this.port}`);
         });
     }
 
@@ -93,7 +92,6 @@ class App {
 
     private async connectToDatabases() {
         try {
-            console.log("connectToDatabases()")
             await mongoConnection();
             await postgresConnection();
         } catch (e) {
@@ -111,7 +109,7 @@ class App {
             swaggerDefinition: {
                 openapi: '3.0.0',
                 info: {
-                    title: 'My API',
+                    title: 'Ipd project rest api',
                     version: '1.0.0',
                     description: 'API для управления заказами и пользователями',
                 },
@@ -120,8 +118,18 @@ class App {
                         url: 'http://localhost:'+this.port,
                     },
                 ],
+                components: {
+                    securitySchemes: {
+                        Bearer: {
+                            type: 'http',
+                            scheme: 'bearer',
+                            bearerFormat: 'JWT',
+                            description: 'Используется токен полученный в запросе /login'
+                        },
+                    },
+                },
             },
-            apis: ['./src/routes/*.ts'], // путь к файлам с аннотациями
+            apis: ['./src/middlewares/auth.middleware.ts','./src/routes/*.ts']
         };
         const swaggerDocs = swaggerJsDoc(swaggerOptions);
         this.expressApp.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response} from "express";
+import {Request, Response} from "express";
 import {IOrder} from '../types/order';
 import {OrderService} from "../services/order.service";
 import {AppError} from "../middlewares/error.middleware";

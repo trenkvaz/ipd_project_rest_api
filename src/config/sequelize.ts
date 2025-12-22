@@ -13,7 +13,6 @@ const port:number = Number(process.env.POSTGRES_PORT!);
 const clearDB:boolean = process.env.CLEAR_DB==='true'
 //console.log(typeof password);
 console.log("POSTGRES:");
-console.log("process.env.CLEAR_DB",process.env.CLEAR_DB)
 console.log("database:",database,"username:",username,"password:",password,"host:",host,"port:",port,"clearDB:",clearDB)
 
 
@@ -68,11 +67,8 @@ export const postgresConnection = async () => {
         await createDatabaseIfNotExists();
         await sequelize_db.authenticate();
         initModels();
-        console.log(" postgresConnection clearDB "+clearDB)
         if(clearDB) await sequelize_db.sync({ force: true });
         else await sequelize_db.sync({ alter: true });
-    //{ alter: true }
-
 }
 
 

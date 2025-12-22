@@ -29,8 +29,104 @@ passport.use(new Strategy(opts, (jwtPayload, done) => {
         return done(null, false);
     }
 }));
+
+
 export const authRouter = ()=>{
+    /**
+     * @swagger
+     * tags:
+     *   name: Logging
+     *   description: Регистрация пользователя и получение токена
+     */
     const router = Router();
+
+    /**
+     * @swagger
+     * /register:
+     *   post:
+     *     tags: [Logging]
+     *     summary: Регистрация нового пользователя
+     *     description: Создает нового пользователя и возвращает сообщение о результате.
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               username:
+     *                 type: string
+     *                 example: "user3"
+     *               password:
+     *                 type: string
+     *                 example: "password11"
+     *     responses:
+     *       201:
+     *         description: Пользователь успешно зарегистрирован
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: "Пользователь успешно зарегистрирован"
+     *       400:
+     *         description: Пользователь с таким именем уже существует
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: "Пользователь с таким именем уже существует"
+     */
+
+    /**
+     * @swagger
+     * /login:
+     *   post:
+     *     tags: [Logging]
+     *     summary: Вход пользователя
+     *     description: Проверяет учетные данные пользователя и возвращает токен.
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               username:
+     *                 type: string
+     *                 example: "user3"
+     *               password:
+     *                 type: string
+     *                 example: "password11"
+     *     responses:
+     *       200:
+     *         description: Успешный вход, возвращает токен
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 token:
+     *                   type: string
+     *                   example: "your_jwt_token_here"
+     *       400:
+     *         description: Неверное имя пользователя или пароль
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 message:
+     *                   type: string
+     *                   example: "Неверное имя пользователя или пароль"
+     */
+
+
     router.post('/login', async (req: Request, res: Response) => {
         const { username, password } = req.body;
 
@@ -71,10 +167,6 @@ export const authRouter = ()=>{
 
 export const authMiddleware =  (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate('jwt', { session: false }, (err: any, user: any, info: any) => {
-        //TODO test
-       /* req.user = "test"; // Установите пользователя
-        next(); // Продолжите к следующему обработчику"test"
-        return*/
         if (err) {
             next(new AppError('Ошибка авторизации: '+err.message,403));
         }

@@ -12,8 +12,6 @@ export const mongoConnection = async () => {
         connectTimeoutMS: 5000,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 5000});
-    console.log("mongoConnection testTB",clearDB)
-
     if(clearDB) clearCollection();
 };
 
